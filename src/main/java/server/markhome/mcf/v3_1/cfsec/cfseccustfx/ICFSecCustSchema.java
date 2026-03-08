@@ -1,7 +1,7 @@
 // Description: Java 13 Cust JavaFX Schema Interface.
 
 /*
- *	io.github.msobkow.CFSec
+ *	server.markhome.mcf.CFSec
  *
  *	Copyright (c) 2020-2025 Mark Stephen Sobkow
  *	
@@ -32,13 +32,13 @@
  *	
  */
 
-package io.github.msobkow.v3_1.cfsec.cfseccustfx;
+package server.markhome.mcf.v3_1.cfsec.cfseccustfx;
 
 import java.security.KeyStore;
 
-import io.github.msobkow.v3_1.cflib.javafx.*;
-import io.github.msobkow.v3_1.cfsec.cfsecjavafx.*;
-import io.github.msobkow.v3_1.cfsec.cfsecobj.*;
+import server.markhome.mcf.v3_1.cflib.javafx.*;
+import server.markhome.mcf.v3_1.cfsec.cfsecjavafx.*;
+import server.markhome.mcf.v3_1.cfsec.cfsecobj.*;
 
 /**
  *	The ICFSecSwingSchema defines the interface for the shared schema

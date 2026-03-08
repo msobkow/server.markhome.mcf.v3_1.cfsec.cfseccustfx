@@ -1,7 +1,7 @@
 // Description: Java 13 Cust JavaFX Schema.
 
 /*
- *	io.github.msobkow.CFSec
+ *	server.markhome.mcf.CFSec
  *
  *	Copyright (c) 2020-2025 Mark Stephen Sobkow
  *	
@@ -32,7 +32,7 @@
  *	
  */
 
-package io.github.msobkow.v3_1.cfsec.cfseccustfx;
+package server.markhome.mcf.v3_1.cfsec.cfseccustfx;
 
 import java.math.*;
 import java.sql.*;
@@ -43,12 +43,15 @@ import java.security.KeyStore;
 import javafx.application.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.SplitPane;
@@ -58,27 +61,30 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.*;
 
 import org.apache.commons.codec.binary.Base64;
 
-import io.github.msobkow.v3_1.cflib.*;
-import io.github.msobkow.v3_1.cflib.dbutil.*;
-import io.github.msobkow.v3_1.cflib.xml.*;
-import io.github.msobkow.v3_1.cflib.javafx.*;
-import io.github.msobkow.v3_1.cfsec.cfsec.*;
-import io.github.msobkow.v3_1.cfsec.cfsecjavafx.*;
-import io.github.msobkow.v3_1.cfsec.cfsecobj.*;
+import server.markhome.mcf.v3_1.cflib.*;
+import server.markhome.mcf.v3_1.cflib.dbutil.*;
+import server.markhome.mcf.v3_1.cflib.xml.*;
+import server.markhome.mcf.v3_1.cflib.javafx.*;
+import server.markhome.mcf.v3_1.cfsec.cfsec.*;
+import server.markhome.mcf.v3_1.cfsec.cfsecjavafx.*;
+import server.markhome.mcf.v3_1.cfsec.cfsecobj.*;
 
-public class CFSecCustConfirmExitAppPane
+public class CFSecCustConfirmLogoutPane
 extends CFBorderPane
 implements ICFForm
 {
-	protected final String S_FormName = "Exit Application";
+	protected final String S_FormName = "Logout";
 	protected ICFFormManager cfFormManager = null;
 	protected ICFSecCustSchema custSchema = null;
 	protected CFSecCustFacetPane facetPane = null;
@@ -87,7 +93,7 @@ implements ICFForm
 	protected CFButton buttonOk = null;
 	protected CFButton buttonCancel = null;
 
-	public CFSecCustConfirmExitAppPane(
+	public CFSecCustConfirmLogoutPane(
 		ICFFormManager formManager, 
 		ICFSecCustSchema argSchema,
 		CFSecCustFacetPane argFacet )
@@ -105,7 +111,7 @@ implements ICFForm
 		facetPane = argFacet;
 
 		labelTitle = new CFLabel();
-		labelTitle.setText( "Are you sure you want to exit the application?" );
+		labelTitle.setText( "Are you sure you want to log out?" );
 		Font f = labelTitle.getFont();
 		Font largeBold = Font.font( f.getFamily(), FontWeight.BOLD, 20 );
 		labelTitle.setFont( largeBold );
@@ -129,10 +135,11 @@ implements ICFForm
 		buttonOk.setMaxHeight( 25 );
 		buttonOk.setPrefHeight( 25 );
 		hboxButtons.getChildren().add( buttonOk );
-		buttonOk.setText( "Yes, exit application" );
+		buttonOk.setText( "Yes, log out" );
 		buttonOk.setOnAction( new EventHandler<ActionEvent>() {
 			@Override public void handle( ActionEvent e ) {
 				try {
+					facetPane.preLogout();
 					ICFSecSchemaObj schemaObj = custSchema.getSchema();
 					if( ( schemaObj != null ) && ( schemaObj.getAuthorization() != null ) ) {
 						try {
@@ -146,7 +153,7 @@ implements ICFForm
 							schemaObj.setAuthorization( null );
 						}
 					}
-					facetPane.exitApplication();
+					facetPane.showLogin();
 				}
 				catch( Throwable t ) {
 					CFConsole.formException( S_FormName, ((CFButton)e.getSource()).getText(), t );

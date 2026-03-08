@@ -1,7 +1,7 @@
 // Description: Java 13 Cust JavaFX Schema.
 
 /*
- *	io.github.msobkow.CFSec
+ *	server.markhome.mcf.CFSec
  *
  *	Copyright (c) 2020-2025 Mark Stephen Sobkow
  *	
@@ -32,7 +32,7 @@
  *	
  */
 
-package io.github.msobkow.v3_1.cfsec.cfseccustfx;
+package server.markhome.mcf.v3_1.cfsec.cfseccustfx;
 
 import java.math.*;
 import java.sql.*;
@@ -49,10 +49,10 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -73,34 +73,29 @@ import javafx.stage.*;
 
 import org.apache.commons.codec.binary.Base64;
 
-import io.github.msobkow.v3_1.cflib.*;
-import io.github.msobkow.v3_1.cflib.dbutil.*;
-import io.github.msobkow.v3_1.cflib.xml.*;
-import io.github.msobkow.v3_1.cflib.javafx.*;
-import io.github.msobkow.v3_1.cfsec.cfsec.*;
-import io.github.msobkow.v3_1.cfsec.cfsecjavafx.*;
-import io.github.msobkow.v3_1.cfsec.cfsecobj.*;
+import server.markhome.mcf.v3_1.cflib.*;
+import server.markhome.mcf.v3_1.cflib.dbutil.*;
+import server.markhome.mcf.v3_1.cflib.xml.*;
+import server.markhome.mcf.v3_1.cflib.javafx.*;
+import server.markhome.mcf.v3_1.cfsec.cfsec.*;
+import server.markhome.mcf.v3_1.cfsec.cfsecjavafx.*;
+import server.markhome.mcf.v3_1.cfsec.cfsecobj.*;
 
-public class CFSecCustSessionPane
+public class CFSecCustTenantTablesPane
 extends CFBorderPane
 implements ICFForm
 {
-	protected final String S_FormName = "Session";
+	protected final String S_FormName = "Tenant Tables";
 	protected ICFFormManager cfFormManager = null;
 	protected ICFSecCustSchema custSchema = null;
 	protected CFSecCustFacetPane facetPane = null;
 	protected CFLabel labelTitle = null;
 	protected ScrollPane scrollButtons = null;
 	protected CFVBox vboxButtons = null;
+	protected CFButton buttonManageTSecGroup = null;
+	protected CFButton buttonBack = null;
 
-	protected CFButton buttonImportFile = null;
-	protected CFButton buttonSystemTables = null;
-	protected CFButton buttonClusterTables = null;
-	protected CFButton buttonTenantTables = null;
-	protected CFButton buttonLogout = null;
-	protected CFButton buttonExitApp = null;
-
-	public CFSecCustSessionPane(
+	public CFSecCustTenantTablesPane(
 		ICFFormManager formManager, 
 		ICFSecCustSchema argSchema,
 		CFSecCustFacetPane argFacet )
@@ -117,11 +112,8 @@ implements ICFForm
 		custSchema = argSchema;
 		facetPane = argFacet;
 
-		setMinWidth( 300.0 );
-		setMinHeight( 200.0 );
-
 		labelTitle = new CFLabel();
-		labelTitle.setText( "You are currently logged in" );
+		labelTitle.setText( "Maintain Tenant Tables" );
 		Font f = labelTitle.getFont();
 		Font largeBold = Font.font( f.getFamily(), FontWeight.BOLD, 20 );
 		labelTitle.setFont( largeBold );
@@ -134,22 +126,21 @@ implements ICFForm
 		vboxButtons.setMinWidth( 220 );
 		vboxButtons.setAlignment( Pos.TOP_CENTER );
 
-		buttonImportFile = new CFButton();
-		buttonImportFile.setVisible( true );
-		buttonImportFile.setMinWidth( 200 );
-		buttonImportFile.setMaxWidth( 200 );
-		buttonImportFile.setPrefWidth( 200 );
-		buttonImportFile.setMinHeight( 25 );
-		buttonImportFile.setMaxHeight( 25 );
-		buttonImportFile.setPrefHeight( 25 );
-		vboxButtons.getChildren().add( buttonImportFile );
-		buttonImportFile.setText( "Import File..." );
-		buttonImportFile.setOnAction( new EventHandler<ActionEvent>() {
+		buttonManageTSecGroup = new CFButton();
+		buttonManageTSecGroup.setVisible( true );
+		buttonManageTSecGroup.setMinWidth( 200 );
+		buttonManageTSecGroup.setMaxWidth( 200 );
+		buttonManageTSecGroup.setPrefWidth( 200 );
+		buttonManageTSecGroup.setMinHeight( 25 );
+		buttonManageTSecGroup.setMaxHeight( 25 );
+		buttonManageTSecGroup.setPrefHeight( 25 );
+		vboxButtons.getChildren().add( buttonManageTSecGroup );
+		buttonManageTSecGroup.setText( "Manage Tenant TSec Group..." );
+		buttonManageTSecGroup.setOnAction( new EventHandler<ActionEvent>() {
 			@Override public void handle( ActionEvent e ) {
 				try {
-					if( facetPane != null ) {
-						facetPane.showFileImport();
-					}
+					CFBorderPane manageTSecGroupForm = custSchema.newManageTenantTSecGroupForm( cfFormManager );
+					cfFormManager.pushForm( manageTSecGroupForm );
 				}
 				catch( Throwable t ) {
 					CFConsole.formException( S_FormName, ((CFButton)e.getSource()).getText(), t );
@@ -157,113 +148,21 @@ implements ICFForm
 			}
 		});
 
-		buttonSystemTables = new CFButton();
-		buttonSystemTables.setVisible( true );
-		buttonSystemTables.setMinWidth( 200 );
-		buttonSystemTables.setMaxWidth( 200 );
-		buttonSystemTables.setPrefWidth( 200 );
-		buttonSystemTables.setMinHeight( 25 );
-		buttonSystemTables.setMaxHeight( 25 );
-		buttonSystemTables.setPrefHeight( 25 );
-		vboxButtons.getChildren().add( buttonSystemTables );
-		buttonSystemTables.setText( "Maintain System Tables..." );
-		buttonSystemTables.setOnAction( new EventHandler<ActionEvent>() {
+		buttonBack = new CFButton();
+		buttonBack.setVisible( true );
+		buttonBack.setMinWidth( 200 );
+		buttonBack.setMaxWidth( 200 );
+		buttonBack.setPrefWidth( 200 );
+		buttonBack.setMinHeight( 25 );
+		buttonBack.setMaxHeight( 25 );
+		buttonBack.setPrefHeight( 25 );
+		vboxButtons.getChildren().add( buttonBack );
+		buttonBack.setText( "Back" );
+		buttonBack.setOnAction( new EventHandler<ActionEvent>() {
 			@Override public void handle( ActionEvent e ) {
 				try {
 					if( facetPane != null ) {
-						facetPane.showSystemTables();
-					}
-				}
-				catch( Throwable t ) {
-					CFConsole.formException( S_FormName, ((CFButton)e.getSource()).getText(), t );
-				}
-			}
-		});
-
-		buttonClusterTables = new CFButton();
-		buttonClusterTables.setVisible( true );
-		buttonClusterTables.setMinWidth( 200 );
-		buttonClusterTables.setMaxWidth( 200 );
-		buttonClusterTables.setPrefWidth( 200 );
-		buttonClusterTables.setMinHeight( 25 );
-		buttonClusterTables.setMaxHeight( 25 );
-		buttonClusterTables.setPrefHeight( 25 );
-		vboxButtons.getChildren().add( buttonClusterTables );
-		buttonClusterTables.setText( "Maintain Cluster Tables..." );
-		buttonClusterTables.setOnAction( new EventHandler<ActionEvent>() {
-			@Override public void handle( ActionEvent e ) {
-				try {
-					if( facetPane != null ) {
-						facetPane.showClusterTables();
-					}
-				}
-				catch( Throwable t ) {
-					CFConsole.formException( S_FormName, ((CFButton)e.getSource()).getText(), t );
-				}
-			}
-		});
-
-		buttonTenantTables = new CFButton();
-		buttonTenantTables.setVisible( true );
-		buttonTenantTables.setMinWidth( 200 );
-		buttonTenantTables.setMaxWidth( 200 );
-		buttonTenantTables.setPrefWidth( 200 );
-		buttonTenantTables.setMinHeight( 25 );
-		buttonTenantTables.setMaxHeight( 25 );
-		buttonTenantTables.setPrefHeight( 25 );
-		vboxButtons.getChildren().add( buttonTenantTables );
-		buttonTenantTables.setText( "Maintain Tenant Tables..." );
-		buttonTenantTables.setOnAction( new EventHandler<ActionEvent>() {
-			@Override public void handle( ActionEvent e ) {
-				try {
-					if( facetPane != null ) {
-						facetPane.showTenantTables();
-					}
-				}
-				catch( Throwable t ) {
-					CFConsole.formException( S_FormName, ((CFButton)e.getSource()).getText(), t );
-				}
-			}
-		});
-
-		buttonLogout = new CFButton();
-		buttonLogout.setVisible( true );
-		buttonLogout.setMinWidth( 200 );
-		buttonLogout.setMaxWidth( 200 );
-		buttonLogout.setPrefWidth( 200 );
-		buttonLogout.setMinHeight( 25 );
-		buttonLogout.setMaxHeight( 25 );
-		buttonLogout.setPrefHeight( 25 );
-		vboxButtons.getChildren().add( buttonLogout );
-		buttonLogout.setText( "Logout" );
-		buttonLogout.setOnAction( new EventHandler<ActionEvent>() {
-			@Override public void handle( ActionEvent e ) {
-				try {
-					if( facetPane != null ) {
-						facetPane.showConfirmLogout();
-					}
-				}
-				catch( Throwable t ) {
-					CFConsole.formException( S_FormName, ((CFButton)e.getSource()).getText(), t );
-				}
-			}
-		});
-
-		buttonExitApp = new CFButton();
-		buttonExitApp.setVisible( true );
-		buttonExitApp.setMinWidth( 200 );
-		buttonExitApp.setMaxWidth( 200 );
-		buttonExitApp.setPrefWidth( 200 );
-		buttonExitApp.setMinHeight( 25 );
-		buttonExitApp.setMaxHeight( 25 );
-		buttonExitApp.setPrefHeight( 25 );
-		vboxButtons.getChildren().add( buttonExitApp );
-		buttonExitApp.setText( "Exit Application" );
-		buttonExitApp.setOnAction( new EventHandler<ActionEvent>() {
-			@Override public void handle( ActionEvent e ) {
-				try {
-					if( facetPane != null ) {
-						facetPane.showConfirmExitApp();
+						cfFormManager.closeCurrentForm();
 					}
 				}
 				catch( Throwable t ) {
